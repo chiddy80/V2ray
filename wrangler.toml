@@ -2,4 +2,12 @@ name = "chiddy-cloud-workers"
 main = "_worker.js"
 compatibility_date = "2025-11-04"
 
+# Keep environment variables during deploy
 keep_vars = true
+
+[vars]
+# Admin password for /login and /admin
+ADMIN =  "chiddy2025"
+
+# Your UUID for worker
+UUID = "c04cb9f4-0a5a-4f13-9569-a385f96f228d"
