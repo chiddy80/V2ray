@@ -7,34 +7,43 @@ jobs:
   sync_branches:
     runs-on: ubuntu-latest
     name: "🔄 Sync branches with main"
+
     env:
       EMAIL: ${{ secrets.GH_EMAIL }}
       NAME: ${{ secrets.GH_USERNAME }}
       TOKEN: ${{ secrets.TOKEN }}
-      REMOTE_NAME: origin
       BRANCH_BASE_NAME: proxyip
       BRANCH_COUNT: 200
 
     steps:
-      - name: 🛠 Set up Git config
+      - name: 🛠 Set Git config
         run: |
-          git config --global user.email "${{ env.EMAIL }}"
-          git config --global user.name "${{ env.NAME }}"
+          git config --global user.email "${EMAIL}"
+          git config --global user.name "${NAME}"
 
-      - name: 📥 Clone repository
-        run: |
-          git clone https:///${{ env.TOKEN }}@github.com/${{github.repository}}.git
-          cd $(echo ${{github.repository}} | awk -F'/' '{print $2}')
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN }}
+          fetch-depth: 0
 
-      - name: 🔄 Sync and push branches
+      - name: 🔄 Sync all branches with main
         run: |
-          cd $(echo ${{github.repository}} | awk -F'/' '{print $2}')
+          git fetch --all
           git checkout main
-          git pull ${REMOTE_NAME} main
-          for ((i=1; i<=${{ env.BRANCH_COUNT }}; i++)); do
-            branch_name="${{ env.BRANCH_BASE_NAME }}${i}"
-            git checkout $branch_name
-            git merge main --no-edit
-            git push ${REMOTE_NAME} $branch_name
-            git checkout main
+          git pull origin main
+
+          for ((i=1; i<=${BRANCH_COUNT}; i++)); do
+            BR="${BRANCH_BASE_NAME}${i}"
+
+            # Check if branch exists
+            if git show-ref --verify --quiet refs/heads/$BR; then
+              echo "➡ Syncing $BR"
+              git checkout $BR
+              git merge main --no-edit || true
+              git push origin $BR
+              git checkout main
+            else
+              echo "❌ Branch $BR does NOT exist, skipping."
+            fi
           done
