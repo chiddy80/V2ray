@@ -7,6 +7,10 @@ keep_vars = true
 ADMIN = "chiddy2025"
 UUID = "c04cb9f4-0a5a-4f13-9569-a385f96f228d"
 
+# KV binding FIXED
 [[kv_namespaces]]
-binding = "CHIDDY_KV"
+binding = "KV"   # MUST be KV because your code uses env.KV
 id = "3a6e01c4b0614a818602a968644537a5"
+
+# Optional: if you want preview KV when running wrangler dev
+# preview_id = "<optional preview id>"
