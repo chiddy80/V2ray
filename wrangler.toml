@@ -5,3 +5,13 @@ keep_vars = true
 
 [vars]
 ADMIN = "chiddy2025"
+
+# existing KV namespace you showed
+[[kv_namespaces]]
+binding = "KV_BINDING"
+id = "3a6e01c4b0614a818602a968644537a5"
+
+# added KV namespace binding as you requested
+[[kv_namespaces]]
+binding = "CHIDDY_KV"
+id = "3a6e01c4b0614a818602a968644537a5"
