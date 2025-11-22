@@ -46,6 +46,55 @@ jobs:
           ref: ${{ env.GIT_REF }}
           fetch-depth: 0
 
+      # ✅ Fix Wrangler Node issue
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 🛸 Env?
+        if: github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'one'
+        run: |
+          echo "WORKERS_ENV=${WENV}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=${COMMIT_SHA}" >> $GITHUB_ENV
+        env:
+          WENV: ${{ github.event.inputs.environment }}
+          COMMIT_SHA: ${{ github.sha }}
+
+      - name: 🎱 Tag?
+        if: github.ref_type == 'tag'
+        run: |
+          echo "WORKERS_ENV=prod" >> $GITHUB_ENV
+          echo "COMMIT_SHA=${COMMIT_SHA}" >> $GITHUB_ENV
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+
+      - name: 🏗 Get dependencies
+        run: npm i
+
+      - name: 📚 Wrangler publish
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          environment: ${{ env.WORKERS_ENV }}
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          GIT_COMMIT_ID: ${{ env.GIT_REF }}
+
+      - name: 🎤 Notice
+        run: |
+          echo "::notice::Deployed to ${WORKERS_ENV} / ${GIT_REF} @ ${COMMIT_SHA}"  deploy:
+    name: 🚀 Deploy worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.GIT_REF }}
+          fetch-depth: 0
+
       # ✅ Fix Wrangler Node version issue
       - name: Use Node.js 20
         uses: actions/setup-node@v4
