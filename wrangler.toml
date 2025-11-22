@@ -1,16 +1,11 @@
 name = "v2ray"
 main = "_worker.js"
-compatibility_date = "2025-11-04"
-keep_vars = true
+compatibility_date = "2025-11-22"
+# node_compat = true
+workers_dev = true
 
 [vars]
-ADMIN = "chiddy2025"
-UUID = "c04cb9f4-0a5a-4f13-9569-a385f96f228d"
-
-# KV binding FIXED
-[[kv_namespaces]]
-binding = "KV"   # MUST be KV because your code uses env.KV
-id = "3a6e01c4b0614a818602a968644537a5"
-
-# Optional: if you want preview KV when running wrangler dev
-# preview_id = "<optional preview id>"
+# PROXYIP = "198.217.251.250:443"
+UUID = "1b6c1745-992e-4aac-8685-266c090e50ea"
+# SOCKS5 = "127.0.0.1:1080"
+# SOCKS5_RELAY = "true"
