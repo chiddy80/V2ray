@@ -18,8 +18,8 @@ jobs:
     steps:
       - name: 🛠 Set Git config
         run: |
-          git config --global user.email "${EMAIL}"
-          git config --global user.name "${NAME}"
+          git config --global user.email "${{ env.EMAIL }}"
+          git config --global user.name "${{ env.NAME }}"
 
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -29,19 +29,26 @@ jobs:
 
       - name: 🔄 Sync all branches with main
         run: |
+          # Ensure we have full branch data
           git fetch --all
-          git checkout main
-          git pull origin main
+
+          # Ensure main exists and up to date
+          git checkout main || git checkout -b main
+          git pull origin main || true
 
           for ((i=1; i<=${BRANCH_COUNT}; i++)); do
             BR="${BRANCH_BASE_NAME}${i}"
 
-            # Check if branch exists
             if git show-ref --verify --quiet refs/heads/$BR; then
               echo "➡ Syncing $BR"
+
               git checkout $BR
+
+              # Merge but never break the workflow
               git merge main --no-edit || true
-              git push origin $BR
+
+              git push origin $BR || true
+
               git checkout main
             else
               echo "❌ Branch $BR does NOT exist, skipping."
