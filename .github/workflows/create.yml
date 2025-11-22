@@ -23,17 +23,25 @@ jobs:
 
       - name: 📦 Clone repository
         run: |
-          git clone https://${{ env.TOKEN }}@github.com/${{github.repository}}.git
-          cd $(echo ${{github.repository}} | awk -F'/' '{print $2}')
+          git clone https://${{ env.TOKEN }}@github.com/${{ github.repository }}.git repo
+          cd repo
 
       - name: 🌿 Create and push branches
         run: |
-          cd $(echo ${{github.repository}} | awk -F'/' '{print $2}')
+          cd repo
+          git checkout main
           for ((i=1; i<=${{ env.BRANCH_COUNT }}; i++)); do
               branch_name="${{ env.BRANCH_BASE_NAME }}${i}"
-              git branch $branch_name
-              git checkout $branch_name
+
+              # Create branch
+              git checkout -b $branch_name
+
+              # Empty commit for branch
               git commit --allow-empty -m "Create branch ${branch_name}"
+
+              # Push new branch
               git push ${{ env.REMOTE_NAME }} $branch_name
+
+              # Return to main
               git checkout main
           done
